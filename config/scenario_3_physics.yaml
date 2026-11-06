@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: 2026 Franz Rohrhofer <frohrhofer@know-center.at>
+# SPDX-License-Identifier: MIT
+#
+# Scenario 3: no data, full physics (PDE + IC + BC).
+#
+#   python main.py -c config/scenario_3_physics.yaml
+
+version: scenario_3_physics    # results are written to results/<version>/
+seed: 0
+
+configs:                       # shared configuration files
+  problem: config/problem.yaml
+  network: config/network.yaml
+  thermocouples: config/thermocouples.yaml
+  reference: data/reference_solution.npz
+
+constraints:
+  hard_ic: true                # T = T_0 at t = 0 built into the network
+                               # (false: learn the IC via the IC loss instead)
+
+losses:                        # loss weights, 0 switches a term off
+  data: 0.0                    # thermocouple measurements
+  pde: 1.0                     # heat equation at collocation points
+  ic: 0.0                      # initial condition T = T_0 at t = 0 (0: hard IC)
+  bc: 1.0                      # convective boundary condition at the edges
+
+sampling:                      # points resampled in every epoch
+  N_col: 4096                  # collocation points, uniform in space-time
+  N_source: 0                  # extra collocation points around the moving arc
+  source_spread: 2.5           # their std around the arc centre [in units of sigma]
+  N_ic: 1024                   # initial-condition points
+  N_bc: 1024                   # boundary-condition points
+
+training:                      # Adam warm-up
+  N_epochs: 1500
+  learning_rate: 0.001
+  decay_rate: 0.9              # lr = lr_0 * decay_rate^(epoch / decay_steps)
+  decay_steps: 1000
+  max_time: null               # optional time budget for the whole training [s]
+
+lbfgs:                         # L-BFGS refinement after Adam (null: Adam only)
+  N_steps: 10                  # outer steps, new points in every step
+  max_iter: 200                # L-BFGS iterations per step (fixed points)
+  learning_rate: 1.0
+  history_size: 50
+  sampling:                    # more points -> consecutive steps more similar
+    N_col: 8192
+    N_bc: 2048
+
+logging:
+  freq_log: 50                # record logs every n epochs
+  freq_print: 50              # print logs every n epochs
+  keys_print: [loss_train, loss_pde, loss_ic, loss_bc, loss_test, rmse_val]

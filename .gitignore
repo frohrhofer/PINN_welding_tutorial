@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+
+# results: only the three trained models of the paper are tracked
+results/*
+!results/.gitkeep
+!results/scenario_1_data/
+!results/scenario_2_data_pde/
+!results/scenario_3_physics/

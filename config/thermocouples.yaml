@@ -1,0 +1,32 @@
+# SPDX-FileCopyrightText: 2026 Franz Rohrhofer <frohrhofer@know-center.at>
+# SPDX-License-Identifier: MIT
+#
+# Virtual thermocouples: synthetic measurements extracted from the reference
+# solution. The same layout is used in all scenarios.
+#
+# All values are in SI units (m, s, K, Hz).
+
+# Thermocouples cannot sit on the weld line (y = 25 mm, they would melt), so
+# they are placed 5-13 mm to either side of it. Positions lie on the 1 mm grid
+# of the stored reference solution, so no spatial interpolation is needed.
+# Sensors with role "test" are never used for training; they serve as
+# independent hold-out data.
+sensors:
+  - {name: TC1,  x: 0.030, y: 0.031, role: train}
+  - {name: TC2,  x: 0.030, y: 0.015, role: train}
+  - {name: TC3,  x: 0.045, y: 0.020, role: train}
+  - {name: TC4,  x: 0.045, y: 0.037, role: train}
+  - {name: TC5,  x: 0.060, y: 0.031, role: train}
+  - {name: TC6,  x: 0.060, y: 0.012, role: train}
+  - {name: TC7,  x: 0.075, y: 0.019, role: train}
+  - {name: TC8,  x: 0.075, y: 0.035, role: train}
+  - {name: TC9,  x: 0.038, y: 0.029, role: test}
+  - {name: TC10, x: 0.068, y: 0.017, role: test}
+
+sampling:
+  frequency: 10.0            # [Hz]  sampling rate of all thermocouples
+                             #       (must divide the reference time resolution)
+
+noise:
+  std: 5.0                   # [K]  standard deviation of additive Gaussian noise
+  seed: 0                    # random seed -> identical noise in every run

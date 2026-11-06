@@ -1,0 +1,51 @@
+# SPDX-FileCopyrightText: 2026 Franz Rohrhofer <frohrhofer@know-center.at>
+# SPDX-License-Identifier: MIT
+#
+# Table C5, row 4: hard IC, Adam + L-BFGS (50 iterations per stage).
+#
+# Training stops after a wall-clock budget of 300 s (training.max_time), so the
+# result depends on the speed of the machine; the paper used a laptop CPU
+# (AMD Ryzen 7 PRO 5850U, one run at a time).
+#
+#   python main.py -c config/studies/table_c5_4_hard_ic_lbfgs50.yaml
+
+version: studies/table_c5_4_hard_ic_lbfgs50
+seed: 0
+configs:
+  problem: config/problem.yaml
+  network: config/network.yaml
+  thermocouples: config/thermocouples.yaml
+  reference: data/reference_solution.npz
+constraints:
+  hard_ic: true
+losses:
+  data: 0.0
+  pde: 1.0
+  ic: 0.0
+  bc: 1.0
+sampling:
+  N_col: 4096
+  N_source: 0
+  source_spread: 2.5
+  N_ic: 1024
+  N_bc: 1024
+training:
+  N_epochs: 1500
+  learning_rate: 0.001
+  decay_rate: 0.9
+  decay_steps: 1000
+  max_time: 300
+lbfgs:
+  N_steps: 1000
+  max_iter: 50
+  learning_rate: 1.0
+  history_size: 50
+logging:
+  freq_log: 100
+  freq_print: 1000
+  keys_print:
+  - loss_train
+  - loss_pde
+  - loss_ic
+  - loss_bc
+  - rmse_val

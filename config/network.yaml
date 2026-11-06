@@ -1,0 +1,26 @@
+# SPDX-FileCopyrightText: 2026 Franz Rohrhofer <frohrhofer@know-center.at>
+# SPDX-License-Identifier: MIT
+#
+# Neural-network configuration: a fully connected network (MLP)
+#
+#   (x, y, t)  ->  T(x, y, t)
+#
+# The same network is used in all scenarios, so that differences in the
+# results come from the training objective (data only vs. data + physics),
+# not from the architecture.
+
+architecture:
+  inputs: [x, y, t]          # space [m] and time [s]
+  outputs: [T]               # temperature [K]
+  hidden_layers: 4           # number of hidden layers
+  neurons_per_layer: 64      # width of every hidden layer
+  activation: tanh           # smooth -> well-defined second derivatives for the PDE
+  initialization: xavier_normal   # weight init (biases are set to zero)
+
+scaling:
+  # Inputs are mapped linearly from the physical domain to [-1, 1]:
+  #   x_hat = 2 x / L - 1,  y_hat = 2 y / W - 1,  t_hat = 2 t / t_end - 1
+  input_range: [-1.0, 1.0]
+  # The network predicts a scaled temperature rise theta ~ O(1):
+  #   T = T_0 + temperature_scale * theta
+  temperature_scale: 1500.0  # [K]  roughly the expected peak temperature rise

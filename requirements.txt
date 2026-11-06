@@ -1,0 +1,8 @@
+# SPDX-FileCopyrightText: 2026 Franz Rohrhofer <frohrhofer@know-center.at>
+# SPDX-License-Identifier: MIT
+# Python >= 3.10
+numpy>=1.23
+scipy>=1.15
+pyyaml>=6.0
+matplotlib>=3.8
+torch>=2.0

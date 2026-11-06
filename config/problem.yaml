@@ -1,0 +1,46 @@
+# SPDX-FileCopyrightText: 2026 Franz Rohrhofer <frohrhofer@know-center.at>
+# SPDX-License-Identifier: MIT
+#
+# Physical problem setup: transient heat conduction in a thin steel plate
+# heated by a moving welding arc.
+#
+#   rho * c_p * dT/dt = k * (d2T/dx2 + d2T/dy2) + Q(x, y, t)
+#
+# All values are in SI units (m, s, K, W, J, kg).
+# Derived quantities (thermal diffusivity, peak heat-source intensity,
+# heat input per length) are computed in code from the values below, so
+# they can never be inconsistent with them.
+
+plate:
+  length: 0.100              # L  [m]   extent in x (welding direction)
+  width: 0.050               # W  [m]   extent in y
+  thickness: 0.003           # d  [m]   thin plate -> T uniform through thickness
+
+material:                    # low-carbon steel, constant properties
+  name: low-carbon steel
+  density: 7800.0            # rho   [kg/m^3]
+  specific_heat: 500.0       # c_p   [J/(kg K)]
+  thermal_conductivity: 45.0 # k     [W/(m K)]
+  melting_temperature: 1790.0  # T_m [K]   approximate, for weld-pool visualization
+  # derived: thermal diffusivity alpha = k / (rho * c_p) = 1.154e-5 m^2/s
+
+heat_source:                 # moving Gaussian arc, x_s(t) = x_0 + v * t
+  power: 2000.0              # P      [W]    nominal arc power U*I (e.g. 12 V x 167 A)
+  efficiency: 0.75           # eta    [-]    arc efficiency
+  travel_speed: 0.005        # v      [m/s]  5 mm/s = 30 cm/min
+  gaussian_width: 0.003      # sigma  [m]    standard deviation of the Gaussian spot
+  start_x: 0.020             # x_0    [m]    arc position at t = 0
+  path_y: 0.025              # y_s    [m]    weld centre line
+  # derived: Q_0 = eta * P / (2 * pi * sigma^2 * d)   peak volumetric source [W/m^3]
+  # derived: eta * P / v                              heat input per length  [J/m]
+
+initial_condition:
+  temperature: 293.15        # T_0  [K]  uniform initial plate temperature (20 degC)
+
+boundary_condition:          # convective edges: -k dT/dn = h * (T - T_inf)
+  type: convective           # "convective" or "adiabatic"
+  heat_transfer_coefficient: 25.0   # h      [W/(m^2 K)]
+  ambient_temperature: 293.15       # T_inf  [K]
+
+time:
+  end: 12.0                  # t_end [s]  arc travels from x = 20 mm to x = 80 mm

@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: 2026 Franz Rohrhofer <frohrhofer@know-center.at>
+# SPDX-License-Identifier: MIT
+#
+# Finite-difference reference solver ("ground truth").
+#
+# Explicit Euler in time + 2nd-order central differences in space (FTCS)
+# on a uniform grid whose nodes lie on the plate edges.
+#
+# All values are in SI units (m, s).
+
+grid:
+  spacing: 0.0005            # dx = dy [m]  solver grid (0.5 mm)
+
+time:
+  # FTCS is stable for  alpha * dt * (1/dx^2 + 1/dy^2) <= 0.5.
+  # The time step is chosen from this target value, then reduced slightly so
+  # that it divides the output time step exactly.
+  fourier_number: 0.4        # [-]
+
+output:
+  # The solution is stored on a coarser grid to keep the file small.
+  # Both values must be integer multiples of the solver resolution.
+  spacing: 0.001             # [m]  stored grid (1 mm)
+  time_step: 0.1             # [s]  stored snapshots (10 Hz)
+  file: data/reference_solution.npz
+
+verification:
+  # Grid-convergence study: the solution is computed on each grid and
+  # compared with the finest one on the common (coarsest) grid.
+  spacings: [0.001, 0.0005, 0.00025]   # [m]
